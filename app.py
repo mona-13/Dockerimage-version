@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/deploy', methods=['POST'])
-def deploy():
-    data = request.json
-    return jsonify({"status": "success", "message": "Deployed successfully!"}), 200
+@app.route('/api', methods=['GET'])
+def get_data():
+    # Simple endpoint that returns a JSON response
+    return jsonify({"message": "Hello from the Flask API!"})
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
