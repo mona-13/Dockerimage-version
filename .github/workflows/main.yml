@@ -47,9 +47,9 @@ jobs:
       #   run: |
       #     docker run -d -p 8080:8080 ghcr.io/${{ github.repository_owner }}/my-local-api:latest
 
-      # # Wait for the container to be ready (optional)
-      # - name: Wait for the container to start
-      #   run: sleep 10
+      # Wait for the container to be ready (optional)
+      - name: Wait for the container to start
+        run: sleep 10
 
       # Make an API call to the locally running Docker container
       - name: Call API
