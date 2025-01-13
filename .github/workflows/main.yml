@@ -1,4 +1,4 @@
-name: Run Flask API in Docker
+name: API Call Workflow
 
 on:
   push:
@@ -6,23 +6,20 @@ on:
       - main
 
 jobs:
-  run-flask-api:
+  api-call:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build and run Flask API Docker container
-        run: |
-          docker build -t flask-api .
-          docker run -d -p 5000:5000 flask-api
+      - name: Set up Docker (if using Docker)
+        uses: docker/setup-buildx-action@v2
 
-      - name: Check Flask API logs
+      - name: Run API server (localhost:8080)
         run: |
-          docker logs $(docker ps -q)  # Show logs from the running container
-
-      - name: Test API call
+          docker run -d -p 8080:8080 your-api-image
+          
+      - name: Call API from workflow
         run: |
-          curl -X POST http://localhost:5000/deploy \
-            -H "Content-Type: application/json" \
-            -d '{"message": "Deploy image"}'
+          curl http://localhost:8080/api  # Or use `host.docker.internal` if in Docker container
