@@ -1,25 +1,53 @@
-name: API Call Workflow
+name: Build and Push Docker Image to GHCR
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  api-call:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker (if using Docker)
-        uses: docker/setup-buildx-action@v2
+      # # Set up Docker Buildx (optional, if you're using advanced Docker features)
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
 
-      - name: Run API server (localhost:8080)
+      # Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}  # GitHub token is automatically available
+
+      # Build the Docker image
+      - name: Build Docker image
         run: |
-          docker run -d -p 8080:8080 your-api-image
-          
-      - name: Call API from workflow
+          docker build -t ghcr.io/${{ github.repository_owner }}/my-local-api:latest .
+
+      # Push the Docker image to GHCR
+      - name: Push Docker image to GHCR
         run: |
-          curl http://localhost:8080/api  # Or use `host.docker.internal` if in Docker container
+          docker push ghcr.io/${{ github.repository_owner }}/my-local-api:latest
+
+      # # Optional: Run the Docker container locally (for testing purposes)
+      # - name: Run Docker container locally (optional)
+      #   run: |
+      #     docker run -d -p 8080:8080 ghcr.io/${{ github.repository_owner }}/my-local-api:latest
+
+      # # Wait for the container to be ready (optional)
+      # - name: Wait for the container to start
+      #   run: sleep 10
+
+      # Make an API call to the locally running Docker container
+      - name: Call API
+        run: |
+          curl http://localhost:8080/api  # Replace with the correct endpoint if needed
