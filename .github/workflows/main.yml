@@ -1,0 +1,24 @@
+name: Run Flask API in Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-flask-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Build and run Flask API Docker container
+        run: |
+          docker build -t flask-api .
+          docker run -d -p 5000:5000 flask-api
+
+      - name: Test API call
+        run: |
+          curl -X POST http://localhost:5000/deploy \
+            -H "Content-Type: application/json" \
+            -d '{"message": "Deploy image"}'
